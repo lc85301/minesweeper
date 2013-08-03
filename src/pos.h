@@ -39,6 +39,8 @@ public:
 
 class PosLand : public Pos {
 public:
-	PosLand(): Pos(){}
+	PosLand(): Pos(){
+		m_land = NONE;
+	}
 };
 #endif /* end of include guard: _POS_H_ */
