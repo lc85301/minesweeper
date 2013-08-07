@@ -5,16 +5,19 @@
 using namespace std;
 
 #include "pos.h"
+typedef vector<Pos*>::iterator iter;
 
 class Minesweeper {
 public:
 	Minesweeper (int width, int height, int num);
 	void init(int width, int height, int num);
 	void initMap();
-	void touchLand(int x, int y);
+	bool touchLand(int x, int y);
 	void markLand (int x, int y);
 
-	typedef vector<Pos>::const_iterator iter;
+	//typedef vector<Pos*>::const_iterator iter;
+	iter begin(){ return minemap.begin();}
+	iter end(){ return minemap.end();}
 private:
 	int countNum(int x, int y);
 private:

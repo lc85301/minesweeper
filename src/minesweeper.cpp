@@ -47,22 +47,29 @@ Minesweeper::initMap()
 		for (int y = 0; y < m_height; ++y) {
 			if (minemap[x*m_height+y] == NULL) {
 				minemap[x*m_height+y] = new PosLand;
-				minemap[x*m_height+y]->m_land = countNum(x, y);
 			}
+		}
+	}
+	for (int x = 0; x < m_width; ++x) {
+		for (int y = 0; y < m_height; ++y) {
+			minemap[x*m_height+y]->m_land = countNum(x, y);
 		}
 	}
 }
 
-void
+//return true if touch a mine
+bool
 Minesweeper::touchLand(int x, int y)
 {
+	bool explode = false;
 	Pos* land = minemap[x*m_height+y];
 	if (!land->m_isFound and land->m_mark != MARK) {
 		land->m_isFound = true;
 		if (land->m_land == MINE) {
-			printf("You are DEAD\n");
+			return true;
 		}
 	}
+	return false;
 }
 
 void
@@ -75,6 +82,7 @@ Minesweeper::markLand(int x, int y)
 int Minesweeper::countNum(int x, int y)
 {
 	int count = 0;
+	if (minemap[x*m_height+y]->m_land == MINE) { return MINE; }
 	for (int i = x-1; i <= x+1; ++i) {
 		for (int j = y-1; j <= y+1; ++j) {
 			if (i<0 or i>=m_width or j<0 or j>=m_height) {
