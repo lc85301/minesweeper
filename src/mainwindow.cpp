@@ -1,14 +1,21 @@
 #include <QtGui>
 
+#include <stdio.h>
+
 #include "mainwindow.h"
 
 MainWindow::MainWindow()
 {
+	//create the view
 	createActions();
 	createMenus();
+	createSignalMapper();
 	createStatusBar();
 
 	setWindowIcon(QIcon(":/images/icon.png"));
+
+	//create the minesweeper
+	m_minesweeper = NULL;
 }
 
 void 
@@ -79,11 +86,85 @@ MainWindow::createStatusBar()
 	statusBar()->addWidget(m_timeLabel);
 };
 
-void MainWindow::newGame(){}
+void 
+MainWindow::createSignalMapper() 
+{
+	m_leftSignalMapper = new QSignalMapper(this);
+	m_rightSignalMapper = new QSignalMapper(this);
+	connect(m_leftSignalMapper, SIGNAL(mapped(int)), this, SLOT(clickLeftButton(int)));
+	connect(m_rightSignalMapper, SIGNAL(mapped(int)), this, SLOT(clickRightButton(int)));
+}
+
+void
+MainWindow::newGame()
+{
+	if (m_minesweeper != NULL) { delete m_minesweeper; }
+	m_minesweeper = new Minesweeper(g_width, g_height, g_minenum);
+	m_land = new QLandButton*[g_width*g_height];
+	//create layout
+	m_window = new QWidget();
+	QHBoxLayout* row = new QHBoxLayout;
+	for (int x = 0; x < g_width; ++x) {
+		QVBoxLayout* column = new QVBoxLayout;
+		for (int y = 0; y < g_height; ++y) {
+			QLandButton* cur = m_land[x*g_height+y];
+			cur = new QLandButton(m_window);
+			cur ->setIcon(QIcon(":/images/null.png"));
+			cur ->setIconSize(QSize(10,10));
+			m_leftSignalMapper->setMapping(cur, x*g_height+y);
+			m_rightSignalMapper->setMapping(cur, x*g_height+y);
+			connect(cur, SIGNAL(clicked()),
+					m_leftSignalMapper, SLOT(map()));
+			connect(cur, SIGNAL(rightClicked()),
+					m_rightSignalMapper, SLOT(map()));
+			column->addWidget(cur);
+		}
+		row->addLayout(column);
+	}
+	m_window->setLayout(row);
+	setCentralWidget(m_window);
+	updateView();
+}
+
 void MainWindow::pauseGame(){}
-void MainWindow::closeGame(){}
-void MainWindow::showRecord(){}
-void MainWindow::saveRecord(){}
+void MainWindow::closeGame(){
+	for (int x = 0; x < g_width; ++x) {
+		for (int y = 0; y < g_height; ++y) {
+			delete m_land[x*g_height+y];
+		}
+	}
+	delete m_window;
+}
+void
+MainWindow::showRecord()
+{
+}
+void
+MainWindow::saveRecord()
+{
+}
+
+void
+MainWindow::updateView()
+{
+	//int i = 0;
+	//for (iter pos = m_minesweeper->begin(); pos != m_minesweeper->end(); ++pos) {
+	//	if (!(*pos)->m_isFound) {
+	//		m_land[i]->setIcon(QIcon(":/images/null.png"));
+	//	} else {
+	//		switch((*pos)->m_mark){
+	//		  case QUESTION:
+	//			  m_land[i]->setIcon(QIcon(":/images/q.png"));
+	//			  break;
+	//		  case MARK:
+	//			  m_land[i]->setIcon(QIcon(":/images/flag.png"));
+	//			  break;
+	//		  default: 
+	//			  m_land[i]->setIcon(QIcon(":/images/1.png"));
+	//		}
+	//	}
+	//}
+}
 
 void
 MainWindow::aboutGame()
@@ -93,4 +174,16 @@ MainWindow::aboutGame()
 			   "<p>Copyright &copy; 2013 Yodalee"
 			   "<p>Minesweeper is a first view minesweeper game"
 			   " wish you like it"));
+}
+
+void 
+MainWindow::clickLeftButton(int index)
+{
+	printf("Left Click: %d\n", index);
+}
+
+void 
+MainWindow::clickRightButton(int index)
+{
+	printf("Right Click: %d\n", index);
 }
