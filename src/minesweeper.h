@@ -14,7 +14,9 @@ public:
 	void initMap();
 	bool touchLand(int x, int y);
 	void markLand (int x, int y);
+	void expandLand(int x, int y);
 
+	bool xy_isValid(int x, int y);
 	//typedef vector<Pos*>::const_iterator iter;
 	iter begin(){ return minemap.begin();}
 	iter end(){ return minemap.end();}

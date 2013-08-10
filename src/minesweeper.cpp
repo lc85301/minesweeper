@@ -67,6 +67,8 @@ Minesweeper::touchLand(int x, int y)
 		land->m_isFound = true;
 		if (land->m_land == MINE) {
 			return true;
+		} else if (land->m_land == NONE) {
+			expandLand(x, y);
 		}
 	}
 	return false;
@@ -75,8 +77,19 @@ Minesweeper::touchLand(int x, int y)
 void
 Minesweeper::markLand(int x, int y)
 {
-	Pos* land = minemap[x*m_height+y];
-	land->setMark();
+	minemap[x*m_height+y]->setMark();
+}
+
+void 
+Minesweeper::expandLand(int x, int y) 
+{
+	for (int i = x-1; i <= x+1; ++i) {
+		for (int j = y-1; j <= y+1; ++j) {
+			if (xy_isValid(i, j)) {
+				touchLand(i,j);
+			}
+		}
+	}
 }
 
 int Minesweeper::countNum(int x, int y)
@@ -85,9 +98,7 @@ int Minesweeper::countNum(int x, int y)
 	if (minemap[x*m_height+y]->m_land == MINE) { return MINE; }
 	for (int i = x-1; i <= x+1; ++i) {
 		for (int j = y-1; j <= y+1; ++j) {
-			if (i<0 or i>=m_width or j<0 or j>=m_height) {
-				break;
-			} else {
+			if (xy_isValid(i, j)) {
 				if (minemap[i*m_height+j]->m_land == MINE) {
 					++count;
 				}
@@ -95,4 +106,10 @@ int Minesweeper::countNum(int x, int y)
 		}
 	}
 	return count;
+}
+
+inline bool
+Minesweeper::xy_isValid(int x, int y)
+{
+	return !(x<0 or x>=m_width or y<0 or y>=m_height);
 }
