@@ -107,17 +107,17 @@ MainWindow::newGame()
 	for (int x = 0; x < g_width; ++x) {
 		QVBoxLayout* column = new QVBoxLayout;
 		for (int y = 0; y < g_height; ++y) {
-			QLandButton* cur = m_land[x*g_height+y];
-			cur = new QLandButton(m_window);
-			cur ->setIcon(QIcon(":/images/null.png"));
-			cur ->setIconSize(QSize(10,10));
-			m_leftSignalMapper->setMapping(cur, x*g_height+y);
-			m_rightSignalMapper->setMapping(cur, x*g_height+y);
-			connect(cur, SIGNAL(clicked()),
+			//QLandButton* cur = m_land[x*g_height+y];
+			m_land[x*g_height+y] = new QLandButton(m_window);
+			m_land[x*g_height+y] ->setIcon(QIcon(":/images/null.png"));
+			m_land[x*g_height+y] ->setIconSize(QSize(10,10));
+			m_leftSignalMapper->setMapping(m_land[x*g_height+y], x*g_height+y);
+			m_rightSignalMapper->setMapping(m_land[x*g_height+y], x*g_height+y);
+			connect(m_land[x*g_height+y], SIGNAL(clicked()),
 					m_leftSignalMapper, SLOT(map()));
-			connect(cur, SIGNAL(rightClicked()),
+			connect(m_land[x*g_height+y], SIGNAL(rightClicked()),
 					m_rightSignalMapper, SLOT(map()));
-			column->addWidget(cur);
+			column->addWidget(m_land[x*g_height+y]);
 		}
 		row->addLayout(column);
 	}
@@ -135,6 +135,7 @@ void MainWindow::closeGame(){
 	}
 	delete m_window;
 }
+
 void
 MainWindow::showRecord()
 {
@@ -147,23 +148,31 @@ MainWindow::saveRecord()
 void
 MainWindow::updateView()
 {
-	//int i = 0;
-	//for (iter pos = m_minesweeper->begin(); pos != m_minesweeper->end(); ++pos) {
-	//	if (!(*pos)->m_isFound) {
-	//		m_land[i]->setIcon(QIcon(":/images/null.png"));
-	//	} else {
-	//		switch((*pos)->m_mark){
-	//		  case QUESTION:
-	//			  m_land[i]->setIcon(QIcon(":/images/q.png"));
-	//			  break;
-	//		  case MARK:
-	//			  m_land[i]->setIcon(QIcon(":/images/flag.png"));
-	//			  break;
-	//		  default: 
-	//			  m_land[i]->setIcon(QIcon(":/images/1.png"));
-	//		}
-	//	}
-	//}
+	int i = 0;
+	for (iter pos = m_minesweeper->begin(); pos != m_minesweeper->end(); ++pos) {
+		switch((*pos)->m_mark){
+		  case QUESTION:
+			m_land[i]->setIcon(QIcon(":/images/q.png"));
+			break;
+		  case MARK:
+			m_land[i]->setIcon(QIcon(":/images/flag.png"));
+			break;
+		  default: 
+			if (!((*pos)->m_isFound)) {
+				m_land[i]->setIcon(QIcon(":/images/null.png"));
+			} else {
+				int landType = (*pos)->m_land;
+				if (landType == MINE) {
+					m_land[i]->setIcon(QIcon(tr(":/images/icon.png")));
+				} else {
+					m_land[i]->setIcon(QIcon(tr(":/images/%1.png").arg(landType)));
+				}
+
+			}
+			break;
+		}
+		++i;
+	}
 }
 
 void
@@ -180,10 +189,14 @@ void
 MainWindow::clickLeftButton(int index)
 {
 	printf("Left Click: %d\n", index);
+	bool isMine = m_minesweeper->touchLand(index/g_height, index%g_height);
+	updateView();
 }
 
 void 
 MainWindow::clickRightButton(int index)
 {
 	printf("Right Click: %d\n", index);
+	m_minesweeper->markLand(index/g_height, index%g_height);
+	updateView();
 }
