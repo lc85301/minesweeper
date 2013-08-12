@@ -14,13 +14,13 @@ Minesweeper::Minesweeper(int width, int height, int num)
 void
 Minesweeper::init(int width, int height, int num)
 {
-	if (width*height < num) 
-	{
+	if (width*height < num) {
 		exit(1);
 	}
 	m_width = width;
 	m_height = height;
 	m_mineNum = num;
+	m_numOpen = 0;
 	minemap.reserve(width*height);
 	initMap();
 }
@@ -58,20 +58,23 @@ Minesweeper::initMap()
 }
 
 //return true if touch a mine
-bool
+statusType
 Minesweeper::touchLand(int x, int y)
 {
-	bool explode = false;
 	Pos* land = minemap[x*m_height+y];
 	if (!land->m_isFound and land->m_mark != MARK) {
 		land->m_isFound = true;
+		++m_numOpen;
 		if (land->m_land == MINE) {
-			return true;
+			return statusMINE;
 		} else if (land->m_land == NONE) {
 			expandLand(x, y);
 		}
+		if (m_numOpen >= m_width*m_height-m_mineNum) {
+			return statusEND;
+		}
 	}
-	return false;
+	return statusNONE;
 }
 
 void

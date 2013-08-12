@@ -133,7 +133,6 @@ void MainWindow::closeGame(){
 			delete m_land[x*g_height+y];
 		}
 	}
-	delete m_window;
 }
 
 void
@@ -189,7 +188,17 @@ void
 MainWindow::clickLeftButton(int index)
 {
 	printf("Left Click: %d\n", index);
-	bool isMine = m_minesweeper->touchLand(index/g_height, index%g_height);
+	statusType status = m_minesweeper->touchLand(index/g_height, index%g_height);
+	switch(status){
+	  case statusMINE:
+		  printf("This is a mine, BOOM!\n");
+		  closeGame();
+	      break;
+	  case statusEND:
+		  printf("You WIN =w=b\n");
+		  closeGame();
+		  break;
+	}
 	updateView();
 }
 
