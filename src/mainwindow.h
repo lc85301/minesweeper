@@ -9,8 +9,8 @@ class QAction;
 class QLabel;
 class QSignalMapper;
 
-const int g_width = 10;
-const int g_height = 10;
+const int g_width = 8;
+const int g_height = 8;
 const int g_minenum = 8;
 
 class MainWindow : public QMainWindow {

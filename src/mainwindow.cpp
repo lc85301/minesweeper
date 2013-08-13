@@ -104,8 +104,14 @@ MainWindow::newGame()
 	//create layout
 	m_window = new QWidget();
 	QHBoxLayout* row = new QHBoxLayout;
+	row->setSpacing(0);
+	row->setMargin(0);
+	row->setContentsMargins(0,0,0,0);
 	for (int x = 0; x < g_width; ++x) {
 		QVBoxLayout* column = new QVBoxLayout;
+		column->setSpacing(0);
+		column->setMargin(0);
+		column->setContentsMargins(0,0,0,0);
 		for (int y = 0; y < g_height; ++y) {
 			//QLandButton* cur = m_land[x*g_height+y];
 			m_land[x*g_height+y] = new QLandButton(m_window);
