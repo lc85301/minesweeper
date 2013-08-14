@@ -9,7 +9,7 @@ MainWindow::MainWindow()
 	//create the view
 	createActions();
 	createMenus();
-	createSignalMapper();
+	createObject();
 	createStatusBar();
 
 	setWindowIcon(QIcon(":/images/icon.png"));
@@ -76,23 +76,29 @@ MainWindow::createMenus()
 void 
 MainWindow::createStatusBar() 
 {
-	m_mineLabel = new QLabel("xxxx xxxxxx: www/www", this);
+	m_mineLabel = new QLabel(QString("mine founded: 0/%1").arg(g_minenum), this);
 	m_mineLabel->setAlignment(Qt::AlignHCenter);
 	m_mineLabel->setMinimumSize(m_mineLabel->sizeHint());
 
-	m_timeLabel = new QLabel("", this);
+	m_timeLabel = new QLabel("0", this);
 
 	statusBar()->addWidget(m_mineLabel);
 	statusBar()->addWidget(m_timeLabel);
 };
 
 void 
-MainWindow::createSignalMapper() 
+MainWindow::createObject() 
 {
+	// signal mapper
 	m_leftSignalMapper = new QSignalMapper(this);
 	m_rightSignalMapper = new QSignalMapper(this);
 	connect(m_leftSignalMapper, SIGNAL(mapped(int)), this, SLOT(clickLeftButton(int)));
 	connect(m_rightSignalMapper, SIGNAL(mapped(int)), this, SLOT(clickRightButton(int)));
+	// timer
+	m_time = 0;
+	m_timer = new QTimer();
+	connect(m_timer, SIGNAL(timeout()), 
+			this, SLOT(timeOut()));
 }
 
 void
@@ -136,6 +142,7 @@ void MainWindow::pauseGame(){}
 void
 MainWindow::stopGame()
 {
+	m_timer->stop();
 	m_window->deleteLater();
 }
 
@@ -182,7 +189,16 @@ MainWindow::updateView()
 		}
 		++i;
 	}
-	//update Label
+}
+
+void 
+MainWindow::updateLabel() 
+{
+	int i = 0;
+	for (iter pos = m_minesweeper->begin(); pos != m_minesweeper->end(); ++pos) {
+		if ((*pos)->m_mark == MARK) { ++i; }
+	}
+	m_mineLabel->setText(QString("mine founded: %1/%2").arg(g_minenum-i).arg(g_minenum));
 }
 
 void
@@ -199,6 +215,8 @@ void
 MainWindow::clickLeftButton(int index)
 {
 	printf("Left Click: %d\n", index);
+	if (!m_timer->isActive()) { m_timer->start(TIMEINTERVAL); }
+	//call minesweeper
 	statusType status = m_minesweeper->touchLand(index/g_height, index%g_height);
 	switch(status){
 	  case statusMINE:
@@ -217,6 +235,17 @@ void
 MainWindow::clickRightButton(int index)
 {
 	printf("Right Click: %d\n", index);
+	if (!m_timer->isActive()) { m_timer->start(TIMEINTERVAL); }
+	//call minesweeper
 	m_minesweeper->markLand(index/g_height, index%g_height);
 	updateView();
+	updateLabel();
+}
+
+void 
+MainWindow::timeOut() 
+{
+	m_time += (float)TIMEINTERVAL/1000;
+	m_timeLabel->setText(QString("%1").arg(m_time));
+	m_timer->start(TIMEINTERVAL);
 }

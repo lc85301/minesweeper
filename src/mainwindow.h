@@ -5,6 +5,8 @@
 #include "minesweeper.h"
 #include "qlandbutton.h"
 
+#define TIMEINTERVAL 100
+
 class QAction;
 class QLabel;
 class QSignalMapper;
@@ -28,14 +30,17 @@ private slots:
 	void aboutGame();
 	void clickLeftButton(int index);
 	void clickRightButton(int index);
+	void timeOut();
 private:
 	void createActions();
 	void createMenus();
 	void createStatusBar();
-	void createSignalMapper();
+	void createObject();
 	void updateView();
+	void updateLabel();
 	void stopGame();
 private:
+	float m_time;
 	Minesweeper *m_minesweeper;
 	QWidget *m_window;
 	QSignalMapper *m_leftSignalMapper;
@@ -51,5 +56,6 @@ private:
 	QLabel *m_mineLabel;
 	QLabel *m_timeLabel;
 	QLandButton **m_land;
+	QTimer *m_timer;
 };
 #endif /* end of include guard: _MAINWINDOW_H_ */
