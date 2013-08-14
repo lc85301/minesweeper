@@ -76,11 +76,11 @@ MainWindow::createMenus()
 void 
 MainWindow::createStatusBar() 
 {
-	m_mineLabel = new QLabel("xxxx xxxxxx: www/www");
+	m_mineLabel = new QLabel("xxxx xxxxxx: www/www", this);
 	m_mineLabel->setAlignment(Qt::AlignHCenter);
 	m_mineLabel->setMinimumSize(m_mineLabel->sizeHint());
 
-	m_timeLabel = new QLabel;
+	m_timeLabel = new QLabel("", this);
 
 	statusBar()->addWidget(m_mineLabel);
 	statusBar()->addWidget(m_timeLabel);
@@ -102,7 +102,7 @@ MainWindow::newGame()
 	m_minesweeper = new Minesweeper(g_width, g_height, g_minenum);
 	m_land = new QLandButton*[g_width*g_height];
 	//create layout
-	m_window = new QWidget();
+	m_window = new QWidget(this);
 	QHBoxLayout* row = new QHBoxLayout;
 	row->setSpacing(0);
 	row->setMargin(0);
@@ -133,12 +133,15 @@ MainWindow::newGame()
 }
 
 void MainWindow::pauseGame(){}
-void MainWindow::closeGame(){
-	for (int x = 0; x < g_width; ++x) {
-		for (int y = 0; y < g_height; ++y) {
-			delete m_land[x*g_height+y];
-		}
-	}
+void
+MainWindow::stopGame()
+{
+	m_window->deleteLater();
+}
+
+void
+MainWindow::closeGame()
+{
 }
 
 void
@@ -153,6 +156,7 @@ MainWindow::saveRecord()
 void
 MainWindow::updateView()
 {
+	//update map layout
 	int i = 0;
 	for (iter pos = m_minesweeper->begin(); pos != m_minesweeper->end(); ++pos) {
 		switch((*pos)->m_mark){
@@ -178,6 +182,7 @@ MainWindow::updateView()
 		}
 		++i;
 	}
+	//update Label
 }
 
 void
@@ -198,11 +203,11 @@ MainWindow::clickLeftButton(int index)
 	switch(status){
 	  case statusMINE:
 		  printf("This is a mine, BOOM!\n");
-		  closeGame();
+		  stopGame();
 	      break;
 	  case statusEND:
 		  printf("You WIN =w=b\n");
-		  closeGame();
+		  stopGame();
 		  break;
 	}
 	updateView();

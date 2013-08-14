@@ -34,6 +34,7 @@ private:
 	void createStatusBar();
 	void createSignalMapper();
 	void updateView();
+	void stopGame();
 private:
 	Minesweeper *m_minesweeper;
 	QWidget *m_window;
