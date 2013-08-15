@@ -9,7 +9,8 @@ DESTDIR = bin
 INCLUDEPATH += .
 
 # Input
-HEADERS += mainwindow.h minesweeper.h qlandbutton.h pos.h
-SOURCES += main.cpp mainwindow.cpp minesweeper.cpp qlandbutton.cpp
+FORMS += setGameDialog.ui
+HEADERS += mainwindow.h minesweeper.h qlandbutton.h pos.h setGameDialog.h
+SOURCES += main.cpp mainwindow.cpp minesweeper.cpp qlandbutton.cpp setGameDialog.cpp
 RESOURCES += minesweeper.qrc
 CONFIG += debug
