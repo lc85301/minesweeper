@@ -10,10 +10,7 @@
 class QAction;
 class QLabel;
 class QSignalMapper;
-
-const int g_width = 8;
-const int g_height = 8;
-const int g_minenum = 8;
+class SetGameDialog;
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -22,6 +19,7 @@ public:
 protected:
 	void closeEvent(QCloseEvent *event);
 private slots:
+	void setGame();
 	void newGame();
 	void pauseGame();
 	void closeGame();
@@ -41,7 +39,11 @@ private:
 	void stopGame();
 private:
 	float m_time;
+	int m_width;
+	int m_height;
+	int m_minenum;
 	Minesweeper *m_minesweeper;
+	SetGameDialog *m_setgamedialog;
 	QWidget *m_window;
 	QSignalMapper *m_leftSignalMapper;
 	QSignalMapper *m_rightSignalMapper;

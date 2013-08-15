@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "mainwindow.h"
+#include "setGameDialog.h"
 
 MainWindow::MainWindow()
 {
@@ -16,6 +17,7 @@ MainWindow::MainWindow()
 
 	//create the minesweeper
 	m_minesweeper = NULL;
+	m_setgamedialog = NULL;
 }
 
 void 
@@ -26,7 +28,7 @@ MainWindow::createActions()
 	m_newAction->setShortcut(tr("F2"));
 	m_newAction->setStatusTip(tr("Start a new game"));
 	connect(m_newAction, SIGNAL(triggered()),
-			this, SLOT(newGame()));
+			this, SLOT(setGame()));
 	
 	m_closeAction = new QAction(tr("&close"), this);
 	m_closeAction->setShortcut(tr("Ctrl+Q"));
@@ -76,7 +78,7 @@ MainWindow::createMenus()
 void 
 MainWindow::createStatusBar() 
 {
-	m_mineLabel = new QLabel(QString("mine founded: 0/%1").arg(g_minenum), this);
+	m_mineLabel = new QLabel(QString("mine founded: 0/%1").arg(m_minenum), this);
 	m_mineLabel->setAlignment(Qt::AlignHCenter);
 	m_mineLabel->setMinimumSize(m_mineLabel->sizeHint());
 
@@ -101,35 +103,46 @@ MainWindow::createObject()
 			this, SLOT(timeOut()));
 }
 
+void 
+MainWindow::setGame() 
+{
+	SetGameDialog dialog(this);
+	if (dialog.exec()) {
+		m_width = dialog.m_width;
+		m_height = dialog.m_height;
+		m_minenum = dialog.m_mine;
+		newGame();
+	}
+}
+
 void
 MainWindow::newGame()
 {
 	if (m_minesweeper != NULL) { delete m_minesweeper; }
-	m_minesweeper = new Minesweeper(g_width, g_height, g_minenum);
-	m_land = new QLandButton*[g_width*g_height];
+	m_minesweeper = new Minesweeper(m_width, m_height, m_minenum);
+	m_land = new QLandButton*[m_width*m_height];
 	//create layout
 	m_window = new QWidget(this);
 	QHBoxLayout* row = new QHBoxLayout;
 	row->setSpacing(0);
 	row->setMargin(0);
 	row->setContentsMargins(0,0,0,0);
-	for (int x = 0; x < g_width; ++x) {
+	for (int x = 0; x < m_width; ++x) {
 		QVBoxLayout* column = new QVBoxLayout;
 		column->setSpacing(0);
 		column->setMargin(0);
 		column->setContentsMargins(0,0,0,0);
-		for (int y = 0; y < g_height; ++y) {
-			//QLandButton* cur = m_land[x*g_height+y];
-			m_land[x*g_height+y] = new QLandButton(m_window);
-			m_land[x*g_height+y] ->setIcon(QIcon(":/images/null.png"));
-			m_land[x*g_height+y] ->setIconSize(QSize(10,10));
-			m_leftSignalMapper->setMapping(m_land[x*g_height+y], x*g_height+y);
-			m_rightSignalMapper->setMapping(m_land[x*g_height+y], x*g_height+y);
-			connect(m_land[x*g_height+y], SIGNAL(clicked()),
+		for (int y = 0; y < m_height; ++y) {
+			m_land[x*m_height+y] = new QLandButton(m_window);
+			m_land[x*m_height+y] ->setIcon(QIcon(":/images/null.png"));
+			m_land[x*m_height+y] ->setIconSize(QSize(10,10));
+			m_leftSignalMapper->setMapping(m_land[x*m_height+y], x*m_height+y);
+			m_rightSignalMapper->setMapping(m_land[x*m_height+y], x*m_height+y);
+			connect(m_land[x*m_height+y], SIGNAL(clicked()),
 					m_leftSignalMapper, SLOT(map()));
-			connect(m_land[x*g_height+y], SIGNAL(rightClicked()),
+			connect(m_land[x*m_height+y], SIGNAL(rightClicked()),
 					m_rightSignalMapper, SLOT(map()));
-			column->addWidget(m_land[x*g_height+y]);
+			column->addWidget(m_land[x*m_height+y]);
 		}
 		row->addLayout(column);
 	}
@@ -198,7 +211,7 @@ MainWindow::updateLabel()
 	for (iter pos = m_minesweeper->begin(); pos != m_minesweeper->end(); ++pos) {
 		if ((*pos)->m_mark == MARK) { ++i; }
 	}
-	m_mineLabel->setText(QString("mine founded: %1/%2").arg(g_minenum-i).arg(g_minenum));
+	m_mineLabel->setText(QString("mine founded: %1/%2").arg(m_minenum-i).arg(m_minenum));
 }
 
 void
@@ -217,7 +230,7 @@ MainWindow::clickLeftButton(int index)
 	printf("Left Click: %d\n", index);
 	if (!m_timer->isActive()) { m_timer->start(TIMEINTERVAL); }
 	//call minesweeper
-	statusType status = m_minesweeper->touchLand(index/g_height, index%g_height);
+	statusType status = m_minesweeper->touchLand(index/m_height, index%m_height);
 	switch(status){
 	  case statusMINE:
 		  printf("This is a mine, BOOM!\n");
@@ -237,7 +250,7 @@ MainWindow::clickRightButton(int index)
 	printf("Right Click: %d\n", index);
 	if (!m_timer->isActive()) { m_timer->start(TIMEINTERVAL); }
 	//call minesweeper
-	m_minesweeper->markLand(index/g_height, index%g_height);
+	m_minesweeper->markLand(index/m_height, index%m_height);
 	updateView();
 	updateLabel();
 }
