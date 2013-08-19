@@ -80,7 +80,10 @@ Minesweeper::touchLand(int x, int y)
 void
 Minesweeper::markLand(int x, int y)
 {
-	minemap[x*m_height+y]->setMark();
+	Pos* land = minemap[x*m_height+y];
+	if (!land->m_isFound) {
+		minemap[x*m_height+y]->setMark();
+	}
 }
 
 void 
