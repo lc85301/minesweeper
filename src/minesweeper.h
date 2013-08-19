@@ -24,11 +24,12 @@ public:
 	iter end(){ return minemap.end();}
 private:
 	int countNum(int x, int y);
-private:
+public:
 	int m_width;
 	int m_height;
 	int m_mineNum;
 	int m_numOpen;
+private:
 	vector<Pos*> minemap;
 };
 #endif /* end of include guard: _MINESWEEPER_H_ */
