@@ -18,6 +18,7 @@ MainWindow::MainWindow()
 	//create the minesweeper
 	m_minesweeper = NULL;
 	m_setgamedialog = NULL;
+	m_isPause = false;
 }
 
 void 
@@ -151,7 +152,14 @@ MainWindow::newGame()
 	updateView();
 }
 
-void MainWindow::pauseGame(){}
+void
+MainWindow::pauseGame()
+{
+	if (m_time != (float)0.0) {
+		m_isPause = !m_isPause;
+		timeOut();
+	}
+}
 void
 MainWindow::stopGame()
 {
@@ -179,26 +187,30 @@ MainWindow::updateView()
 	//update map layout
 	int i = 0;
 	for (iter pos = m_minesweeper->begin(); pos != m_minesweeper->end(); ++pos) {
-		switch((*pos)->m_mark){
-		  case QUESTION:
-			m_land[i]->setIcon(QIcon(":/images/q.png"));
-			break;
-		  case MARK:
-			m_land[i]->setIcon(QIcon(":/images/flag.png"));
-			break;
-		  default: 
-			if (!((*pos)->m_isFound)) {
-				m_land[i]->setIcon(QIcon(":/images/null.png"));
-			} else {
-				int landType = (*pos)->m_land;
-				if (landType == MINE) {
-					m_land[i]->setIcon(QIcon(tr(":/images/icon.png")));
+		if (m_isPause) {
+			m_land[i]->setIcon(QIcon(":/images/null.png"));
+		} else {
+			switch((*pos)->m_mark){
+			  case QUESTION:
+				m_land[i]->setIcon(QIcon(":/images/q.png"));
+				break;
+			  case MARK:
+				m_land[i]->setIcon(QIcon(":/images/flag.png"));
+				break;
+			  default: 
+				if (!((*pos)->m_isFound)) {
+					m_land[i]->setIcon(QIcon(":/images/null.png"));
 				} else {
-					m_land[i]->setIcon(QIcon(tr(":/images/%1.png").arg(landType)));
-				}
+					int landType = (*pos)->m_land;
+					if (landType == MINE) {
+						m_land[i]->setIcon(QIcon(tr(":/images/icon.png")));
+					} else {
+						m_land[i]->setIcon(QIcon(tr(":/images/%1.png").arg(landType)));
+					}
 
+				}
+				break;
 			}
-			break;
 		}
 		++i;
 	}
@@ -258,6 +270,7 @@ MainWindow::clickRightButton(int index)
 void 
 MainWindow::timeOut() 
 {
+	if (m_isPause) { return; }
 	m_time += (float)TIMEINTERVAL/1000;
 	m_timeLabel->setText(QString("%1").arg(m_time));
 	m_timer->start(TIMEINTERVAL);

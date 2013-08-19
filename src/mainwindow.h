@@ -42,6 +42,7 @@ private:
 	int m_width;
 	int m_height;
 	int m_minenum;
+	bool m_isPause;
 	Minesweeper *m_minesweeper;
 	SetGameDialog *m_setgamedialog;
 	QWidget *m_window;
