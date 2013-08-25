@@ -107,19 +107,20 @@ MainWindow::createObject()
 void 
 MainWindow::setGame() 
 {
-	SetGameDialog dialog(this);
-	if (dialog.exec()) {
-		m_width = dialog.m_width;
-		m_height = dialog.m_height;
-		m_minenum = dialog.m_mine;
-		newGame();
+	if (okToContinue()) {
+		SetGameDialog dialog(this);
+		if (dialog.exec()) {
+			m_width = dialog.m_width;
+			m_height = dialog.m_height;
+			m_minenum = dialog.m_mine;
+			newGame();
+		}
 	}
 }
 
 void
 MainWindow::newGame()
 {
-	if (m_minesweeper != NULL) { delete m_minesweeper; }
 	m_minesweeper = new Minesweeper(m_width, m_height, m_minenum);
 	m_land = new QLandButton*[m_width*m_height];
 	//create layout
@@ -170,6 +171,24 @@ MainWindow::stopGame()
 void
 MainWindow::closeGame()
 {
+}
+
+bool
+MainWindow::okToContinue() 
+{
+	if (m_minesweeper != NULL && m_time != (float)0.0) {
+		if (!m_isPause) { pauseGame(); }
+		int r = QMessageBox::warning(
+			this, tr("minesweeper"), tr("The game has been started. Do you want to restart another round?"),
+			QMessageBox::Yes | QMessageBox::No);
+		if (r == QMessageBox::Yes) {
+			if (m_minesweeper != NULL) { delete m_minesweeper; }
+			return true;
+		} else {
+			return false;
+		}
+	}
+	return true;
 }
 
 void

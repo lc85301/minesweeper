@@ -23,6 +23,7 @@ private slots:
 	void newGame();
 	void pauseGame();
 	void closeGame();
+	bool okToContinue();
 	void showRecord();
 	void saveRecord();
 	void aboutGame();
