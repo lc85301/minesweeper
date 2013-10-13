@@ -18,7 +18,7 @@ A first view minesweeper game.
   or install them by the proper way depends on your distribution.
 
 ## Bugs:
-* Please report bugs / mis-formatted pages to the github issure tracker.
+* Please report bugs to the github issure tracker.
 
 ## Contributing
 1. Fork it
